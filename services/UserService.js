@@ -54,4 +54,15 @@ class UserService {
   }
 }
 
-module.exports = UserService;
+const UserSerializer = (obj, many = false) => {
+  if (many) {
+    const users = obj.map(user => UserSerializer(user));
+    return users;
+  } else {
+    const { password, ...user } = obj;
+    return user;
+  }
+};
+
+module.exports.UserService = UserService;
+module.exports.UserSerializer = UserSerializer;

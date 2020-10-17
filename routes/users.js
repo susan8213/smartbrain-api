@@ -1,18 +1,19 @@
 var express = require("express");
 const serveStatic = require("serve-static");
 var router = express.Router();
-const UserService = require("../services/UserService");
+const { UserService, UserSerializer } = require("../services/UserService");
 
 /* GET users listing. */
 router.get("/", function(req, res, next) {
-  res.send(new UserService().getUserList());
+  const users = new UserService().getUserList();
+  res.send(UserSerializer(users, true));
 });
 
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   const user = new UserService().getUserByID(id);
   if (user) {
-    res.send(user);
+    res.send(UserSerializer(user));
   } else {
     res.status(404).send();
   }
@@ -21,7 +22,7 @@ router.get("/:id", (req, res) => {
 router.post("/register", (req, res) => {
   const user = new UserService().signUp(req.body);
   if (user) {
-    res.send(user);
+    res.send(UserSerializer(user));
   } else {
     res.status(400).send("Duplicate user.");
   }
@@ -30,7 +31,7 @@ router.post("/register", (req, res) => {
 router.post("/signin", (req, res) => {
   const user = new UserService().signIn(req.body);
   if (user) {
-    res.send(user);
+    res.send(UserSerializer(user));
   } else {
     res.status(400).send("Email or Password is incorrect.");
   }
@@ -40,7 +41,7 @@ router.put("/:id/image", (req, res) => {
   const { id } = req.params;
   const user = new UserService().entry(id);
   if (user) {
-    res.send(user);
+    res.send(UserSerializer(user));
   } else {
     res.status(404).send();
   }
