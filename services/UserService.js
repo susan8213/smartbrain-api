@@ -1,4 +1,5 @@
 const users = require("../models/users");
+const bcrypt = require("bcrypt-nodejs");
 
 class UserService {
   constructor() {}
@@ -19,7 +20,7 @@ class UserService {
     const { email, password } = data;
     const user = this.getUserByEmail(email);
     if (user) {
-      if (user.password === password) {
+      if (bcrypt.compareSync(password, user.hash)) {
         return user;
       }
     }
@@ -36,7 +37,7 @@ class UserService {
       id: users[users.length - 1].id + 1,
       name: name,
       email: email,
-      password: password,
+      hash: bcrypt.hashSync(password),
       entries: 0,
       joined: new Date()
     };
@@ -59,7 +60,7 @@ const UserSerializer = (obj, many = false) => {
     const users = obj.map(user => UserSerializer(user));
     return users;
   } else {
-    const { password, ...user } = obj;
+    const { hash, ...user } = obj;
     return user;
   }
 };

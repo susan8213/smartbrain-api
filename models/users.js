@@ -3,7 +3,8 @@ const user = [
     id: 123,
     name: "John",
     email: "john@gmail.com",
-    password: "cookies",
+    // password: "cookies",
+    hash: "$2a$10$aP8FCsTSXysCntpEHChFOuPLVVtMIAabUbtdpZISeM7qH0AKwonoS",
     entries: 0,
     joined: new Date()
   },
@@ -11,7 +12,8 @@ const user = [
     id: 124,
     name: "Sally",
     email: "sally@gmail.com",
-    password: "banana",
+    // password: "banana",
+    hash: "$2a$10$DQ.qgNZwZP3AiiNJ5BNEVetWJ4Is/30BsISJ3XPiC/lG6lknjVT8q",
     entries: 0,
     joined: new Date()
   }
