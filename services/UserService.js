@@ -1,69 +1,74 @@
-const users = require("../models/users");
+const { User, UserSecret } = require("../models/users");
 const bcrypt = require("bcrypt-nodejs");
 
-class UserService {
-  constructor() {}
-
-  getUserList() {
-    return users;
-  }
-
-  getUserByID(id) {
-    return users.find(user => user.id == id);
-  }
-
-  getUserByEmail(email) {
-    return users.find(user => user.email === email);
-  }
-
-  signIn(data) {
-    const { email, password } = data;
-    const user = this.getUserByEmail(email);
-    if (user) {
-      if (bcrypt.compareSync(password, user.hash)) {
-        return user;
-      }
-    }
-    return;
-  }
-
-  signUp(data) {
-    const { email, name, password } = data;
-    if (this.getUserByEmail(email)) {
-      return;
-    }
-
-    const user = {
-      id: users[users.length - 1].id + 1,
-      name: name,
-      email: email,
-      hash: bcrypt.hashSync(password),
-      entries: 0,
-      joined: new Date()
-    };
-    users.push(user);
-    return user;
-  }
-
-  entry(id) {
-    for (let user of users) {
-      if (user.id == id) {
-        user.entries++;
-        return user;
-      }
-    }
-  }
-}
-
-const UserSerializer = (obj, many = false) => {
-  if (many) {
-    const users = obj.map(user => UserSerializer(user));
-    return users;
-  } else {
-    const { hash, ...user } = obj;
-    return user;
+exports.getUserList = async (req, res) => {
+  try {
+    const users = await User.getAll();
+    return res.json(users);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err.message);
   }
 };
 
-module.exports.UserService = UserService;
-module.exports.UserSerializer = UserSerializer;
+exports.getUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await User.getById(id);
+    if (!user.length) {
+      return res.status(400).send();
+    }
+    return res.json(user[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err.message);
+  }
+};
+
+exports.signUp = async (req, res) => {
+  const { email, name, password } = req.body;
+  //TODO: validation
+
+  const user = new User(name, email);
+  const userSecret = new UserSecret(email, bcrypt.hashSync(password));
+  try {
+    const result = await User.create(user, userSecret);
+    return res.json(result[0]);
+  } catch (err) {
+    const msg = err.message;
+    if (msg.includes("duplicate key value")) {
+      return res.status(400).send("Duplicate user.");
+    }
+    console.log(err);
+    return res.status(500).send(msg);
+  }
+};
+
+exports.signIn = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const secret = await UserSecret.getByEmail(email);
+    const user = await User.getByEmail(email);
+    if (!(secret && bcrypt.compareSync(password, secret[0].hash))) {
+      return res.status(400).send("Email or Password is incorrect.");
+    }
+    return res.json(user[0]);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err.message);
+  }
+};
+
+exports.entry = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await User.incrementById(id, { entries: 1 });
+    if (!result.length) {
+      return res.status(400).send();
+    }
+    return res.json(result[0].entries);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err.message);
+  }
+};
