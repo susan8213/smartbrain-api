@@ -1,7 +1,7 @@
 const Clarifai = require("clarifai");
 
 const FaceApp = new Clarifai.App({
-  apiKey: "051ff981dbdc4ffeb04e0926719704ab"
+  apiKey: process.env.CLARIFAI_API_KEY
 });
 
 exports.detect = async (req, res) => {
