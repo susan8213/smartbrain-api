@@ -1,5 +1,4 @@
 var express = require("express");
-const serveStatic = require("serve-static");
 var router = express.Router();
 const ClarifaiService = require("../services/ClarifaiService");
 
