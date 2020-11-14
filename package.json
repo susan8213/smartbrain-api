@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint --ignore-path .gitignore .",
+    "coverage": "codecov"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -20,13 +21,14 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
+    "codecov": "^3.8.1",
     "eslint": "^7.11.0",
     "eslint-config-babel": "^9.0.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-standard": "^4.0.1",
-    "prettier": "^1.19.1",
-    "nodemon": "^2.0.5"
+    "nodemon": "^2.0.5",
+    "prettier": "^1.19.1"
   }
 }
