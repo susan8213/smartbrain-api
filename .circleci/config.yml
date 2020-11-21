@@ -3,11 +3,68 @@ orbs:
   node: circleci/node@3.0.0
   heroku: circleci/heroku@1.2.3
 jobs:
+  test:
+    docker:
+      - image: circleci/node:12.18
+        environment:
+          APP_ENV: test
+          NODE_ENV: test
+          DB_HOST: localhost
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          DB_DATABASE: smart-brain
+      - image: circleci/postgres:alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: smart-brain
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: Install npm dependencies
+          command: |
+            npm ci
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run:
+          name: Install postgres client
+          command: |
+            sudo apt-get install postgresql-client
+      - run:
+          name: Install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Restore db schema
+          command: |
+            psql -U postgres -h localhost -p 5432 -d smart-brain < dbscripts/schema.sql
+      - run:
+          name: "Run Linter"
+          command: npm run lint -- --format junit -o reports/junit/js-lint-results.xml
+      - run:
+          name: "Run Test Suite"
+          environment:
+            JEST_JUNIT_OUTPUT: reports/junit/js-test-results.xml
+          command: npm run test -- --ci --testResultsProcessor="jest-junit"
+      - store_test_results:
+          path: reports/junit
+      - store_artifacts:
+          path: reports/junit
   build:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages
       - setup_remote_docker:
           version: 18.06.0-ce
       - run:
@@ -35,9 +92,11 @@ jobs:
 workflows:
   build-test-deploy:
     jobs:
+      - test
       - build
       - deploy:
           requires:
+            - test
             - build
           filters:
             branches:
