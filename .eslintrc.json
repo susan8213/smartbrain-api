@@ -11,6 +11,7 @@
     "parser": "babel-eslint",
     "env": {
         "node": true,
+        "jest": true,
         "commonjs": true,
         "es2021": true
     },
