@@ -56,8 +56,9 @@ jobs:
       - run:
           name: "Run Test Suite"
           environment:
-            JEST_JUNIT_OUTPUT: reports/junit/js-test-results.xml
-          command: npm run test -- --ci --testResultsProcessor="jest-junit"
+            JEST_JUNIT_OUTPUT_DIR: reports/junit/
+            JEST_JUNIT_OUTPUT_NAME: js-test-results.xml
+          command: npm test -- --ci --runInBand --reporters=default --reporters=jest-junit
       - store_test_results:
           path: reports/junit
       - store_artifacts:
