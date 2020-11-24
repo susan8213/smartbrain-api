@@ -16,7 +16,7 @@ exports.getUser = async (req, res) => {
   try {
     const user = await User.getById(id);
     if (!user.length) {
-      return res.status(400).send();
+      return res.status(404).send();
     }
     return res.json(user[0]);
   } catch (err) {
@@ -27,13 +27,17 @@ exports.getUser = async (req, res) => {
 
 exports.signUp = async (req, res) => {
   const { email, name, password } = req.body;
+
   //TODO: validation
+  if (!(email && name && password)) {
+    return res.status(400).send("Wrong inputs");
+  }
 
   const user = new User(name, email);
   const userSecret = new UserSecret(email, bcrypt.hashSync(password));
   try {
     const result = await User.create(user, userSecret);
-    return res.json(result[0]);
+    return res.status(201).json(result[0]);
   } catch (err) {
     const msg = err.message;
     if (msg.includes("duplicate key value")) {
@@ -49,7 +53,7 @@ exports.signIn = async (req, res) => {
   try {
     const secret = await UserSecret.getByEmail(email);
     const user = await User.getByEmail(email);
-    if (!(secret && bcrypt.compareSync(password, secret[0].hash))) {
+    if (!(secret.length && bcrypt.compareSync(password, secret[0].hash))) {
       return res.status(400).send("Email or Password is incorrect.");
     }
     return res.json(user[0]);
@@ -64,7 +68,7 @@ exports.entry = async (req, res) => {
   try {
     const result = await User.incrementById(id, { entries: 1 });
     if (!result.length) {
-      return res.status(400).send();
+      return res.status(404).send();
     }
     return res.json(result[0].entries);
   } catch (err) {
