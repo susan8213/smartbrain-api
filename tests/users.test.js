@@ -141,7 +141,7 @@ describe("User API", () => {
         .send({ email: body.email, password: faker.internet.password() });
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body).toEqual("Email or Password is incorrect.");
+      expect(res.text).toEqual("Email or Password is incorrect.");
     });
 
     it("should return bad request and error message when the email is incorrect", async () => {
@@ -159,7 +159,7 @@ describe("User API", () => {
         .send({ email: faker.internet.email(), password: body.password });
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body).toEqual("Email or Password is incorrect.");
+      expect(res.text).toEqual("Email or Password is incorrect.");
     });
   });
 
