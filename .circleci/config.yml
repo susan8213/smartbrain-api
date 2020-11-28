@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@3.0.0
+  codecov: codecov/codecov@1.1.3
   heroku: circleci/heroku@1.2.3
 jobs:
   test:
@@ -63,6 +64,12 @@ jobs:
           path: reports/junit
       - store_artifacts:
           path: reports/junit
+      - run:
+          name: Codecov coverage
+          command: |
+            npm run coverage
+      - codecov/upload:
+          file: "./coverage/clover.xml"
   build:
     executor: node/default
     steps:

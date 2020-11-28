@@ -5,6 +5,7 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "lint": "eslint --ignore-path .gitignore .",
+    "coverage": "codecov",
     "test": "jest tests"
   },
   "dependencies": {
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
+    "codecov": "^3.8.1",
     "eslint": "^7.11.0",
     "eslint-config-babel": "^9.0.0",
     "eslint-config-prettier": "^6.10.0",
@@ -41,6 +43,6 @@
       "/node_modules/"
     ],
     "coverageDirectory": "./coverage/",
-    "collectCoverage": false
+    "collectCoverage": true
   }
 }
