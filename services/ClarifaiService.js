@@ -7,10 +7,7 @@ const FaceApp = new Clarifai.App({
 exports.detect = async (req, res) => {
   const { url } = req.body;
   try {
-    const result = await FaceApp.models.predict(
-      Clarifai.FACE_DETECT_MODEL,
-      url
-    );
+    const result = await FaceApp.models.predict("face-detection", url);
     return res.json(result);
   } catch (err) {
     const response = err.response;
