@@ -29,3 +29,6 @@ Backend server API Github Repository: https://github.com/susan8213/smartbrain-ap
 3. Face detection function - integrated with Clarifai AI model
 4. Supertest/Jest Testing
 5. CI Integration with CircleCI and Codecov
+6. Deploying build to ~~Heroku~~ Render.com (Heroku alternative platform)
+
+
